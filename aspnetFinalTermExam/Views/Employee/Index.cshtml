@@ -1,0 +1,89 @@
+﻿@model aspnetFinalTermExam.Models.EmployeeSearchArg
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>查詢員工</h1>
+@using (Html.BeginForm("Index", "Employee", FormMethod.Post, new { id = "Form1" }))
+{
+    <div id="SearchConditionSection" class="container">
+        <table class="table table-bordered">
+            <tr>
+                <td>員工編號</td>
+                <td colspan="4">@Html.TextBoxFor(model => model.EmployeeID)</td>
+            </tr>
+            <tr>
+                <td>員工姓名</td>
+                <td colspan="4">@Html.TextBoxFor(model => model.FirstName)</td>
+            </tr>
+            <tr>
+                <td>職稱</td>
+                <td colspan="4">@Html.DropDownListFor(model => model.CodeId, (List<SelectListItem>)ViewBag.EmpCodeData, "")</td>
+            </tr>
+            <tr>
+                <td>任職日期</td>
+                <td>@Html.TextBoxFor(model => model.HireDate, new { @type = "date" })</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4">
+                    <input type="submit" value="查詢" />
+                    <input type="reset" value="清除" />
+                    @Html.ActionLink("新增員工", "InsertEmp")
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="Search">
+        <br>
+        <br>
+        @if (ViewBag.SearchResult != null)
+        {
+            <table class="table table-bordered table-striped" border="1">
+                <tr>
+                    <td>員工編號</td>
+                    <td>員工姓名</td>
+                    <td>職稱</td>
+                    <td>任職日期</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @foreach (var item in (List<aspnetFinalTermExam.Models.Employee>)ViewBag.SearchResult)
+                {
+                    <tr id='@item.EmployeeID'>
+                        <td>@item.FirstName @item.LastName</td>
+                        <td>@item.CodeId  @item.Title</td>
+                        <td>@item.HireDate</td>
+                        <td>@item.Gender</td>
+                        <td>@Html.ActionLink("修改", "UpdateEmp", new { id = item.EmployeeID })</td>
+                        <td>
+                            <a class="btnDelete" href="#">刪除</a>
+                            <input class="hidEmpId" type="hidden" value='@item.EmployeeID' />
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+}
+@section scripts{
+    <script type="text/javascript">
+
+        $(".btnDelete").click(function (e) {
+            console.log(e);
+            var tr = $(this).closest('tr')
+            $.ajax({
+                type: "POST",
+                url: "/Order/DeleteOrder",
+                data: "orderId=" + $(this).next().val(),
+                dataType: "json",
+                success: function (response) {
+                    $(tr).remove();
+                }
+            });
+            return false;
+        });
+    </script>
+}
